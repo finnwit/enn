@@ -1,0 +1,45 @@
+# === OS & Editor Files ===
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+
+# === Decker files (ignore both root + OnlineWebsite versions) ===
+.decker
+OnlineWebsite/.decker
+
+# === Public output directories (ignore contents, not folder itself) ===
+public/
+OnlineWebsite/public/
+
+# === Node / Build Artifacts (optional) ===
+node_modules/
+dist/
+build/
+
+# === Other temporary or cache folders ===
+.cache/
+.tmp/
+.env
+.ipynb_checkpoints
+**/.ipynb_checkpoints
+
+# === Symlinks handling ===
+# Track symbolic links inside OnlineWebsite
+# (We don’t ignore them; we ignore their targets if already ignored)
+# So no rule here ignores OnlineWebsite/* — the symlinks will be committed.
+
+# === Explicitly DO NOT ignore OnlineWebsite symlinks ===
+!OnlineWebsite/styles
+!OnlineWebsite/data
+!OnlineWebsite/demos
+!OnlineWebsite/msms
+!OnlineWebsite/References
+!OnlineWebsite/decker.yaml
+!OnlineWebsite/chicago-author-date.csl
