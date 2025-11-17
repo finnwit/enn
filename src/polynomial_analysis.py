@@ -6,6 +6,19 @@ structures in the correct format so that tests and example notebooks can
 run successfully.
 """
 
+def get_candidate_features():
+    """
+    Return a fixed list of Top K features (obtained from earlier tasks)
+    """
+    return [
+        "livingSpace",
+        "yearConstructed",
+        "noParkSpaces",
+        "picturecount",
+        "noRooms",
+    ]
+
+
 def build_polynomial_design_matrix(X_full, n_features, degree):
     """
     Given the cleaned dataframe, a feature list, and a polynomial degree:

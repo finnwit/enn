@@ -96,6 +96,8 @@ def test_stepwise_model_performance():
     # Find the 5-feature combination
     assert result[4] is not None, "No feature set with 5 features found"
     selected_features = result[4]["features"]
+    assert "totalRent" not in selected_features, "not allowed as a feature"
+    assert "baseRent" not in selected_features, "not allowed as a feature"
 
     # Prepare data
     X_train = df_train[selected_features]

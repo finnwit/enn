@@ -17,9 +17,6 @@ You are tasked with implementing the model!
 import numpy as np
 from sklearn.metrics import r2_score, root_mean_squared_error
 
-import numpy as np
-from sklearn.metrics import r2_score, root_mean_squared_error
-
 class GradientDescentLinearModel:
     """
     Dummy version of a gradient-descent-based linear regression model.
@@ -140,6 +137,52 @@ class GradientDescentLinearModel:
                 self.val_curve.append(val_rmse)
 
         return self
+    
+    # --------------------------------------------------
+    # Optional: You might as well want to have a
+    # transfer training function (dummy!)
+    # --------------------------------------------------
+
+    def transfer_training(self,
+                                X_pre_train, y_pre_train, X_pre_val, y_pre_val,
+                                X_ft_train, y_ft_train, X_ft_val, y_ft_val,
+                                fine_tune_steps=300,
+                                prefix_pre="pre",
+                                prefix_ft="ft"):
+        """
+        Transfer learning method using gradient descent:
+        1) Pretrain on (X_pre)
+        2) Evaluate before fine-tuning
+        3) Fine-tune on (X_ft)
+        4) Evaluate after fine-tuning
+        Prefixes define naming in the result dict.
+        """
+        res = {}
+        # ---- 1) Pretrain ----
+        self.fit(X_pre_train, y_pre_train, X_pre_val, y_pre_val)
+
+        # ---- 2) Evaluate before fine-tuning ----
+        res[f"before_{prefix_pre}_{prefix_pre}"] = \
+            self.evaluate(X_pre_train, y_pre_train, X_pre_val, y_pre_val)
+
+        res[f"before_{prefix_pre}_{prefix_ft}"] = \
+            self.evaluate(X_pre_train, y_pre_train, X_ft_val, y_ft_val)
+
+        # ---- 3) Using the optional Fine-tune above ----
+        self.continue_training(
+            X_ft_train, y_ft_train,
+            X_ft_val,   y_ft_val,
+            steps=fine_tune_steps
+        )
+
+        # ---- 4) Evaluate after fine-tuning ----
+        res[f"after_{prefix_ft}_{prefix_pre}"] = \
+            self.evaluate(X_pre_train, y_pre_train, X_pre_val, y_pre_val)
+
+        res[f"after_{prefix_ft}_{prefix_ft}"] = \
+            self.evaluate(X_ft_train, y_ft_train, X_ft_val, y_ft_val)
+
+        return res
 
     # --------------------------------------------------
     # Prediction

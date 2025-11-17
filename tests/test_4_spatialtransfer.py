@@ -17,16 +17,13 @@ import pytest
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score, root_mean_squared_error
 
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.preprocessing import clean_data
-from src.baseline_model import train_baseline_model, evaluate_model
 from src.gradient_descent import GradientDescentLinearModel
 from src.spatial_transfer import run_cross_domain_evaluation_spatial
-from src.feature_analysis import analyze_single_features, stepwise_selection
 
 # ---------------------------------------------------------------------
 # Helper: load and clean data
@@ -105,13 +102,13 @@ def test_cross_domain_generalization():
         assert r["rmse_val"]   > 0, f"{key}: rmse_val <= 0"
 
     # task 4.2: Muenster model should degrade on BI (we just check this with a fixed margin of 0.1)
-    assert results["MS_train_MS_val"]["r2_val"] + 0.1 > results["MS_train_BI_val"]["r2_val"], \
+    assert results["MS_train_MS_val"]["r2_val"] > results["MS_train_BI_val"]["r2_val"] + 0.1, \
         "Expected: MS→MS > MS→BI"
 
     print("✅ Cross-domain generalization tests passed.")
 
     # task 4.3: Overfitting on small BI data (we just check this with a fixed margin of 0.1)
-    assert results["BI_train_BI_val"]["r2_train"] + 0.1 > results["BI_train_BI_val"]["r2_val"], \
+    assert results["BI_train_BI_val"]["r2_train"] + 0.1 > results["BI_train_BI_val"]["r2_val"] + 0.1, \
         "Expected: BItrain→BItrain > BItrain→BIval"
 
     print("✅ Bielefeld overfitting tests passed.")
@@ -158,8 +155,10 @@ def test_gradient_descent_on_muenster():
     # Check that the fine-tuning / further training leads to better results for
     # the Bielefeld validation data compared to a model trained only on the
     # Bielefeld training data
-    assert results_neq["BI_train_BI_val"]["r2_val"] < res_transfer["after_BI_BI"]["r2_val"]
+    assert results_neq["BI_train_BI_val"]["r2_val"] < res_transfer["after_ft_ft"]["r2_val"]
     # and compared to the model trained on Muenster data
-    assert results_neq["MS_train_BI_val"]["r2_val"] < res_transfer["after_BI_BI"]["r2_val"]
+    assert results_neq["MS_train_BI_val"]["r2_val"] < res_transfer["after_ft_ft"]["r2_val"]
+    # Check for r2 on validation set greater 0.65
+    assert res_transfer["after_ft_ft"]["r2_val"] > 0.65
 
-    print("✅ Bielefeld transfer - from ", results_neq["BI_train_BI_val"]["r2_val"], " improved to (after transfer) ", res_transfer["after_BI_BI"]["r2_val"])
+    print("✅ Bielefeld transfer - from ", results_neq["BI_train_BI_val"]["r2_val"], " improved to (after transfer) ", res_transfer["after_ft_ft"]["r2_val"])
