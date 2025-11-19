@@ -17,7 +17,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.feature_analysis import analyze_single_features, stepwise_selection
 from src.preprocessing import clean_data
-from src.baseline_model import evaluate_feature_set
 from src.visualization import plot_feature_performance
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error
