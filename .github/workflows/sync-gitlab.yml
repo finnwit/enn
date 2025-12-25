@@ -1,0 +1,95 @@
+name: Sync from public GitLab (only if changed)
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"   # alle 6 Stunden (UTC)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (GitHub)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add GitLab upstream and read SHAs
+        id: shas
+        run: |
+          # >>> HIER GitLab-Repo-URL eintragen:
+          GITLAB_URL="https://zivgitlab.uni-muenster.de/ai-systems/teaching/public/ws-25/enn-minilabs.git"
+
+          git remote add upstream "$GITLAB_URL"
+
+          # GitLab default branch ist main:
+          UPSTREAM_SHA=$(git ls-remote upstream refs/heads/main | awk '{print $1}')
+          echo "Upstream SHA: $UPSTREAM_SHA"
+
+          # Aktueller Stand von upstream-main auf GitHub (kann leer sein, wenn Branch noch nicht existiert)
+          CURRENT_SHA=$(git ls-remote origin refs/heads/upstream-main | awk '{print $1}' || true)
+          echo "Current upstream-main SHA: $CURRENT_SHA"
+
+          echo "upstream_sha=$UPSTREAM_SHA" >> $GITHUB_OUTPUT
+          echo "current_sha=$CURRENT_SHA" >> $GITHUB_OUTPUT
+
+          if [ -n "$CURRENT_SHA" ] && [ "$UPSTREAM_SHA" = "$CURRENT_SHA" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: No changes → stop
+        if: steps.shas.outputs.changed == 'false'
+        run: echo "No changes on GitLab. Nothing to do."
+
+      - name: Update upstream-main branch on GitHub (exactly to GitLab main)
+        if: steps.shas.outputs.changed == 'true'
+        run: |
+          # upstream-main exakt auf den GitLab-SHA setzen (auch wenn GitLab force-pushed hat)
+          git push origin "${{ steps.shas.outputs.upstream_sha }}:refs/heads/upstream-main" --force
+
+      - name: Fetch branches
+        if: steps.shas.outputs.changed == 'true'
+        run: |
+          git fetch origin --prune
+
+      - name: Check if upstream-main is ahead of main
+        if: steps.shas.outputs.changed == 'true'
+        id: diff
+        run: |
+          AHEAD=$(git rev-list --count origin/main..origin/upstream-main)
+          echo "ahead=$AHEAD" >> $GITHUB_OUTPUT
+          echo "Commits upstream-main ahead of main: $AHEAD"
+
+      - name: Create PR (only if main is behind)
+        if: steps.shas.outputs.changed == 'true' && steps.diff.outputs.ahead != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # PR existiert schon?
+          EXISTING=$(gh pr list --head upstream-main --base main --state open --json number -q '.[0].number')
+          if [ -z "$EXISTING" ]; then
+            gh pr create \
+              --head upstream-main \
+              --base main \
+              --title "Sync: GitLab updates" \
+              --body "Automatischer Sync aus GitLab (public)."
+          else
+            echo "PR already open: #$EXISTING"
+          fi
+
+      - name: close PR if no longer needed
+        if: steps.shas.outputs.changed == 'true' && steps.diff.outputs.ahead == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          EXISTING=$(gh pr list --head upstream-main --base main --state open --json number -q '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "No diff anymore; closing PR #$EXISTING"
+            gh pr close "$EXISTING" --comment "Upstream ist wieder im main enthalten – PR wird geschlossen."
+          fi
