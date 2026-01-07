@@ -20,8 +20,7 @@ class SimpleNeuralNetwork:
     # Forward pass components
     # -------------------------------------------------
     def sigmoid(self, a):
-        # TODO Implement sigmoid activation
-        return np.zeros_like(a)
+       return 1 / (1 + np.exp(-a))
 
     def forward(self, X):
         # TODO Realize the forward pass
