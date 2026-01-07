@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.constants import sigma
 
 
 class SimpleNeuralNetwork:
@@ -25,11 +26,9 @@ class SimpleNeuralNetwork:
     def forward(self, X):
         # TODO Realize the forward pass
         # Currently: Returns arrays with correct shapes, but no real computation.
-        N = X.shape[0]
-        output_dim = 3
         # Return both: Activation values and after application of activation function (output)
-        a = np.zeros((N, output_dim))
-        y_hat = np.zeros((N, output_dim))
+        a = X @ self.W +self.b
+        y_hat = self.sigmoid(a)
         return a, y_hat
 
     # -------------------------------------------------
@@ -38,7 +37,7 @@ class SimpleNeuralNetwork:
     def compute_loss(self, y_hat, y):
         # TODO Compute the loss (MSE)
         # Currently simply returning a value.
-        return float(np.mean(y_hat))
+        return (1/2)*np.square(np.subtract(y_hat,y)).mean()
 
     # -------------------------------------------------
     # Backward pass (gradient computation)
@@ -63,7 +62,7 @@ class SimpleNeuralNetwork:
         #   - start from (y_hat - y)
         #   - multiply with the derivative of the sigmoid
         #   - sigmoid'(a) can be expressed using y_hat
-        delta = np.zeros_like(y_hat)
+        delta =
 
         # TODO 2:
         # Compute the gradient w.r.t. the weights
