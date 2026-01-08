@@ -19,8 +19,15 @@ def plot_training_curve(loss_history, path):
         Path to the saved figure.
     """
     plt.figure(figsize=(6, 4))
-    # TODO: Implement a plot function that visualizes the Learning over time (as given in the loss_history)
-
+    loss = np.array(loss_history)
+    epochs = np.arange(len(loss))
+    plt.plot(epochs, loss, marker=".")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Training Loss")
+    plt.tight_layout()
+    plt.savefig(path)
+    plt.close()
     return path
 
 # Exercise 1 - Visualization of the data set and decision regions
