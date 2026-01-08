@@ -43,3 +43,7 @@ build/
 !OnlineWebsite/References
 !OnlineWebsite/decker.yaml
 !OnlineWebsite/chicago-author-date.csl
+
+# Ignore files in any results folder recursively
+**/results/*
+!**/results/.gitkeep
