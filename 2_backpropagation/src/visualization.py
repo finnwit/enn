@@ -121,6 +121,19 @@ def plot_hidden_size_vs_accuracy(
     # and test accuracies (given on the y-axis)
     # with respect to the hidden layer size.
 
+    plt.figure(figsize=(8, 6))
+    plt.plot(hidden_sizes, train_accuracies, marker='o', label='Train Accuracy ')
+    plt.plot(hidden_sizes, test_accuracies, marker='s', label='Test Accuracy ')
+    plt.xlabel('Hidden Layer Size')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy vs Hidden Layer Size')
+    plt.xticks(hidden_sizes)
+    plt.ylim(0, 1)
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(path)
+    plt.close()
+
     return path
 
 def plot_mean_learning_curve(losses, accuracies, label, path):

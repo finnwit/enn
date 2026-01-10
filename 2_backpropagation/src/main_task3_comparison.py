@@ -28,6 +28,15 @@ test_accs = []
 # and collect train and test errors at the end of training 
 for h in hidden_sizes:
     print(f"\nTraining MLP with hidden_dim = {h}")
+    mlp = MLPOneHiddenLayer(hidden_dim=h, lr=lr, epochs=epochs)
+    mlp.reset_weights()
+    mlp.fit(X_train, y_train_labels, batch_size=batch_size)
+    train_accs.append(mlp.predict(X_train) == np.argmax(y_train, axis=1))
+    y_test_pred = mlp.predict(X_test)
+    test_accs.append(mlp.predict(X_test) == np.argmax(y_test, axis=1))
+
+
+
 
 # Plot results
 # --------------------------------------------------
