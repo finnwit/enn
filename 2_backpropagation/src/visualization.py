@@ -60,8 +60,27 @@ def plot_decision_regions(model, X, y, path):
     # - predict the class for all of these using model.predict
     # - visualize this, e.g. using contourf plots 
 
-    # The data points could - for example - be shown in a scatter plot:
-    plt.scatter(X[:, 0], X[:, 1], c=y, edgecolor="k", s=20)
+    # Create a grid over the data range with some margin
+    margin = 0.5
+    x_min, x_max = X[:, 0].min() - margin, X[:, 0].max() + margin
+    y_min, y_max = X[:, 1].min() - margin, X[:, 1].max() + margin
+
+    # Create meshgrid for the decision boundary
+    xx, yy = np.meshgrid(
+        np.linspace(x_min, x_max, 200),
+        np.linspace(y_min, y_max, 200)
+    )
+
+    # Flatten the grid and predict for each point
+    grid_points = np.c_[xx.ravel(), yy.ravel()]
+    Z = model.predict(grid_points)
+    Z = Z.reshape(xx.shape)
+
+    # Plot decision regions
+    plt.contourf(xx, yy, Z, alpha=0.8, cmap=plt.cm.RdYlBu)
+
+    # Plot data points
+    plt.scatter(X[:, 0], X[:, 1], c=y, edgecolor="k", s=20, cmap=plt.cm.RdYlBu)
     plt.xlabel("x_1")
     plt.ylabel("x_2")
     plt.title("Linear decision regions")
