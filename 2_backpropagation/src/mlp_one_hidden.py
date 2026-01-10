@@ -39,17 +39,12 @@ class MLPOneHiddenLayer:
         # - hidden layer in second dimension
         # in an np.array.
         # Leads to computation order: Input array X applied to matrix W.
-        self.W1 = np.array([[5.290, 24.748, 9.823, -22.713, 13.622],
-                                  [21.145, -28.266, 0.001, 1.745, 8.618]])
-        self.b1 = np.array([13.955, -1.079, -1.420, -9.452, -6.745])
+        self.W1 = np.random.randn(self.input_dim, self.hidden_dim)
+        self.b1 = np.zeros(self.hidden_dim)
 
-        self.W2 = np.array([[-17.921, 3.912, 23.039],
-                                    [-10.631, -5.133, 15.726],
-                                    [27.089, -17.227, -18.574],
-                                    [-0.646, -12.115, 7.881],
-                                    [-24.915, 32.302, -11.516]])
+        self.W2 = np.random.randn(self.hidden_dim, self.output_dim)
 
-        self.b2 = np.array([14.265, -0.281, -25.521])
+        self.b2 = np.zeros(self.output_dim)
         
 
     # -------------------------------------------------
