@@ -203,8 +203,7 @@ class MLPOneHiddenLayer:
 
                 activations, y_hat = self.forward(Xb)
                 loss = self.compute_loss(y_hat, yb)
-                self.loss_history.append(loss)
-
+                epoch_loss += loss
                 grads = self.backward(yb, activations)
                 self.gradient_step(grads)
             self.loss_history.append(epoch_loss / N)
