@@ -39,11 +39,17 @@ class MLPOneHiddenLayer:
         # - hidden layer in second dimension
         # in an np.array.
         # Leads to computation order: Input array X applied to matrix W.
-        self.W1 = 0.01 * np.random.randn(self.input_dim, self.hidden_dim)
-        self.b1 = np.zeros(self.hidden_dim)
+        self.W1 = np.array([[5.290, 24.748, 9.823, -22.713, 13.622],
+                                  [21.145, -28.266, 0.001, 1.745, 8.618]])
+        self.b1 = np.array([13.955, -1.079, -1.420, -9.452, -6.745])
 
-        self.W2 = 0.01 * np.random.randn(self.hidden_dim, self.output_dim)
-        self.b2 = np.zeros(self.output_dim)
+        self.W2 = np.array([[-17.921, 3.912, 23.039],
+                                    [-10.631, -5.133, 15.726],
+                                    [27.089, -17.227, -18.574],
+                                    [-0.646, -12.115, 7.881],
+                                    [-24.915, 32.302, -11.516]])
+
+        self.b2 = np.array([14.265, -0.281, -25.521])
         
 
     # -------------------------------------------------
@@ -51,7 +57,7 @@ class MLPOneHiddenLayer:
     # -------------------------------------------------
     def sigmoid(self, a):
         # TODO Implement sigmoid activation
-        return np.zeros_like(a)
+        return 1/ (1 + np.exp(-a))
 
     def forward(self, X):
         """
@@ -61,16 +67,16 @@ class MLPOneHiddenLayer:
         needed for backpropagation.
         """
         # TODO 1: compute a1 activations in hidden layer neurons
-        a1 = np.zeros((X.shape[0], self.hidden_dim))
+        a1 = X @ self.W1 + self.b1
 
         # TODO 2: apply activation function -> z1
-        z1 = np.zeros_like(a1)
+        z1 = self.sigmoid(a1)
 
         # TODO 3: compute a2 activations in output neurons
-        a2 = np.zeros((X.shape[0], self.output_dim))
+        a2 = z1 @ self.W2 + self.b2
 
         # TODO 4: compute y_hat output (apply activation function)
-        y_hat = np.zeros_like(a2)
+        y_hat = self.sigmoid(a2)
 
         activations = {
             "X": X,
@@ -90,7 +96,7 @@ class MLPOneHiddenLayer:
         MSE loss.
         """
         # TODO Compute the loss
-        return float(np.mean(y_hat))
+        return ((y_hat - y)**2).mean()
 
     # -------------------------------------------------
     # Backward pass (gradient computation)
@@ -100,7 +106,7 @@ class MLPOneHiddenLayer:
         Derivative of sigmoid σ'(a) expressed via σ(a) = z.
         """
         # TODO Implement derivative of sigmoid using z
-        return np.zeros_like(z)
+        return (1-z)*z
     
     def backward(self, y, activations):
         """
@@ -119,26 +125,26 @@ class MLPOneHiddenLayer:
         # TODO 1: Compute output layer error term (delta2)
         # Hint: sigmoid'(a2) can be expressed via y_hat
         # -----------------------------------------
-        delta2 = np.zeros_like(y_hat)
+        delta2 = (y_hat - y) * self.sigmoid_derivative(y_hat)
 
         # -----------------------------------------
         # TODO 2: Gradients for W2 and b2
         # -----------------------------------------
-        dW2 = np.zeros_like(self.W2)
-        db2 = np.zeros_like(self.b2)
+        dW2 = (z1.T @ delta2) / N
+        db2 = np.mean(delta2, axis=0)
 
         # -----------------------------------------
         # TODO 3: Hidden layer error term (delta1)
         # delta1 = (delta2 @ W2^T) * sigmoid'(a1)
         # Hint: sigmoid'(a1) can be expressed via z1
         # -----------------------------------------
-        delta1 = np.zeros_like(z1)
+        delta1 = (delta2 @ self.W2.T) * self.sigmoid_derivative(z1)
 
         # -----------------------------------------
         # TODO 4: Gradients for W1 and b1
         # -----------------------------------------
-        dW1 = np.zeros_like(self.W1)
-        db1 = np.zeros_like(self.b1)
+        dW1 = (X.T @ delta1) / N
+        db1 = np.mean(delta1 , axis=0)
 
         grads = {"W1": dW1, "b1": db1, "W2": dW2, "b2": db2}
         return grads
@@ -151,10 +157,10 @@ class MLPOneHiddenLayer:
         Performs one gradient descent update
         """
         # TODO Apply parameter updates using self.lr
-        # self.W1 -= ...
-        # self.b1 -= ...
-        # self.W2 -= ...
-        # self.b2 -= ...
+        self.W1 -= grads["W1"] * self.lr
+        self.b1 -= grads["b1"] * self.lr
+        self.W2 -= grads["W2"] * self.lr
+        self.b2 -= grads["b2"] * self.lr
         pass
 
     # -------------------------------------------------
@@ -195,6 +201,12 @@ class MLPOneHiddenLayer:
                 #   backward pass
                 #   update / gradient step
 
+                activations, y_hat = self.forward(Xb)
+                loss = self.compute_loss(y_hat, yb)
+                self.loss_history.append(loss)
+
+                grads = self.backward(yb, activations)
+                self.gradient_step(grads)
             self.loss_history.append(epoch_loss / N)
 
     # -------------------------------------------------
