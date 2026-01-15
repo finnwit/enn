@@ -32,6 +32,16 @@ class TorchMLP(nn.Module):
         # --------------------------------------------------
         # TODO: Create layers (as done in the exercises) and activation functions
 
+        self.input_to_hidden = nn.Linear(in_features=2, out_features=hidden_dim)  # Input Layer to Hidden Layer
+        
+        self.sigmoid = nn.Sigmoid()                                               # Sigmoid activation - Hidden Layer
+        
+        self.reLU = nn.ReLU()                                                      # ReLU activation - Hidden Layer (if preferred)
+
+        self.hidden_to_output = nn.Linear(in_features=hidden_dim, out_features=3) # Output Layer (Linear Layer towards output)
+        
+        self.softmax = nn.Softmax(dim=1)                                          # Softmax activation - Output Layer (if needed)
+
     # --------------------------------------------------
     # Forward pass
     # --------------------------------------------------
@@ -53,4 +63,14 @@ class TorchMLP(nn.Module):
         # Initially, this will fail! There are no parameters and 
         # there is no working forward pass.
         # Pytorch will therefore fail creating autonmatically the backward pass / autograd.
-        return 0
+        
+        z1 = self.input_to_hidden(x)          # Linear transformation to hidden layer
+        a1 = self.sigmoid(z1)                 # Sigmoid activation
+        
+        z2 = self.hidden_to_output(a1)        # Linear transformation to output layer
+        
+        y_hat_sigmoid = self.sigmoid(z2)      # Sigmoid activation
+        y_hat_softmaxed = self.softmax(z2)    # Softmax activation (if preferred)
+
+
+        return y_hat_sigmoid                  # or return y_hat_softmaxed if softmax is preferred
