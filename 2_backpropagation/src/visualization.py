@@ -210,5 +210,43 @@ def plot_accuracy_comparison(acc_list_1, acc_list_2,
     #    In a first step compute mean and std.dev. values
     # 2) Generate for each of the two acc_lists / conditions
     #    a line as a plot (and an area visualizing the std.dev.)
+    
+    plt.figure(figsize=(12, 7))
+
+    # Hilfsfunktion, um Redundanz zu vermeiden
+    def plot_with_std(acc_list, label, color):
+        # 1. Konvertierung in NumPy Array (Shape: [Runs, Epochs])
+        data = np.array(acc_list)
+        
+        # 2. Statistik über die Runs (axis=0) berechnen
+        mean_vals = np.mean(data, axis=0)
+        std_vals = np.std(data, axis=0)
+        epochs = np.arange(len(mean_vals))
+
+        # 3. Den Mittelwert plotten
+        plt.plot(epochs, mean_vals, label=label, color=color, linewidth=2)
+        
+        # 4. Den Bereich der Standardabweichung schattieren
+        plt.fill_between(epochs, 
+                         mean_vals - std_vals, 
+                         mean_vals + std_vals, 
+                         color=color, alpha=0.2)
+
+    # Beide Datensätze plotten
+    plot_with_std(acc_list_1, label_1, color='tab:blue')
+    plot_with_std(acc_list_2, label_2, color='tab:orange')
+
+    # Styling des Plots
+    plt.title('Einfluss der Batch-Größe auf die Trainings-Accuracy', fontsize=14)
+    plt.xlabel('Epochen', fontsize=12)
+    plt.ylabel('Accuracy (Genauigkeit)', fontsize=12)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.legend(loc='lower right')
+    plt.ylim([0, 1.05])  # Accuracy liegt immer zwischen 0 und 1
+
+    # Speichern des Ergebnisses
+    plt.tight_layout()
+    plt.savefig(path)
+    plt.close()
 
     return path
