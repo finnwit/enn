@@ -21,7 +21,7 @@ def load_spiral_npz(batch_size=8, shuffle=True):
     """
 
     # Load NumPy data
-    data = np.load("../data/spiral_dataset.npz")
+    data = np.load("data/spiral_dataset.npz")
 
     # Convert inputs to torch tensors
     X_train = torch.tensor(data["X_train"], dtype=torch.float32)
