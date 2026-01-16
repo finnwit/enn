@@ -21,13 +21,13 @@ class SimpleNeuralNetwork:
     # Forward pass components
     # -------------------------------------------------
     def sigmoid(self, a):
-       return 1 / (1 + np.exp(-a))
+        return 1 / (1 + np.exp(-a))
 
     def forward(self, X):
         # TODO Realize the forward pass
         # Currently: Returns arrays with correct shapes, but no real computation.
         # Return both: Activation values and after application of activation function (output)
-        a = X @ self.W +self.b
+        a = X @ self.W + self.b
         y_hat = self.sigmoid(a)
         return a, y_hat
 
@@ -66,7 +66,7 @@ class SimpleNeuralNetwork:
         # Hint:
         #   - you will have to use the Input values and delta
         #   - if you want to deal with batches: average over the batch size
-        N = X.shape[0] # The batch size N.
+        N = X.shape[0]  # The batch size N.
         dW = (X.T @ delta) / N
 
         # Computes the gradient w.r.t. the bias
@@ -102,7 +102,7 @@ class SimpleNeuralNetwork:
 
         # Realize gradient descent (iteratively)
         for _ in range(self.epochs):
-            # TODOs: 
+            # TODOs:
             #   Forward pass
             #   Compute loss
             #     and self.loss_history.append(loss)
@@ -123,7 +123,7 @@ class SimpleNeuralNetwork:
         """
         _, y_hat = self.forward(X)
         return np.argmax(y_hat, axis=1)
-    
+
     def predict_proba(self, X):
         """
         Predict probabilities per class (sigmoid outputs).

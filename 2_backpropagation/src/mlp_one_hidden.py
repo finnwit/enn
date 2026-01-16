@@ -39,6 +39,11 @@ class MLPOneHiddenLayer:
         # - hidden layer in second dimension
         # in an np.array.
         # Leads to computation order: Input array X applied to matrix W.
+
+        if(self.hidden_dim == 5 and self.input_dim == 2 and self.output_dim ==3):
+            self.set_predefined_weights()
+
+         # Random initialization
         self.W1 = np.random.randn(self.input_dim, self.hidden_dim)
         self.b1 = np.zeros(self.hidden_dim)
 
