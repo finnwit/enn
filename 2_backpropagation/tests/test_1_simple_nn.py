@@ -25,7 +25,7 @@ def test_simple_nn_training_and_visualization():
     # ------------------------------------------------------------------
     # Load data
     # ------------------------------------------------------------------
-    data = np.load("data/spiral_dataset.npz")
+    data = np.load("../data/spiral_dataset.npz")
     X_train, y_train = data["X_train"], data["y_train"]
     X_test, y_test = data["X_test"], data["y_test"]
 
