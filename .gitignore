@@ -46,4 +46,5 @@ build/
 
 # Ignore files in any results folder recursively
 **/results/*
+/results/*
 !**/results/.gitkeep
